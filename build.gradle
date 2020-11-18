@@ -1,0 +1,53 @@
+plugins {
+	id "application"
+	id "org.flywaydb.flyway" version "7.2.0"
+}
+apply plugin : "java"
+ext {
+	javaMainClass = "com.carracing.CarRacingApplication"
+}
+
+application {
+	mainClassName = javaMainClass
+}
+
+run{
+	standardInput = System.in
+}
+
+group = 'com.carracing'
+version = '1.0.0-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+	mavenLocal()
+	jcenter()
+	mavenCentral()
+}
+
+dependencies {
+	runtimeOnly 'mysql:mysql-connector-java:8.0.22'
+	annotationProcessor 'org.projectlombok:lombok:1.18.16'
+	compileOnly 'org.projectlombok:lombok:1.18.16'
+	implementation 'org.flywaydb:flyway-core:7.2.0'
+
+	testCompileOnly("org.projectlombok:lombok:1.18.16")
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.16'
+	testImplementation('junit:junit:4.13')
+	testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.6.0'
+}
+
+flyway {
+	driver = 'com.mysql.cj.jdbc.Driver'
+	sqlMigrationPrefix = 'V'
+	sqlMigrationSuffixes= '.sql'
+	url = 'jdbc:mysql://localhost:3306/car_racing'
+	user = 'admin'
+	password = 'admin'
+	schemas = ['car_racing']
+	locations = [
+			'filesystem:src/main/resources/db/migration/mysql'
+	]
+}
+
+run.dependsOn(flywayMigrate)
